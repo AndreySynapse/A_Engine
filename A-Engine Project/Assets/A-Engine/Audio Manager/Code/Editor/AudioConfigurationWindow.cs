@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using UnityEngine;
 using UnityEditor;
+using AEngine.Parser;
 
 namespace AEngine.Audio
 {
@@ -220,8 +221,8 @@ namespace AEngine.Audio
 				audioData = new Dictionary<string, AudioBlock> ();
 			else
 				audioData.Clear ();
-                        
-            XmlNode rootNode = XmlDataParser.FindUniqueTag (xmlDocument, "AudioData");
+
+            XmlNode rootNode = XmlParser.GetRootTag(xmlDocument, AudioConstants.XML_ROOT);
 			if (XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioSettings")) {
 				XmlNode defaultNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioSettings");
 				defaultSetting.useMusic = bool.Parse(defaultNode.Attributes ["useMusic"].Value);
@@ -255,7 +256,7 @@ namespace AEngine.Audio
 		private void SaveConfiguration (bool saveAdditionalToResources = false)
 		{
 			XmlDocument xmlDocument = new XmlDocument ();
-			XmlNode root = XmlDataParser.CreateRootNode (xmlDocument, "AudioData");
+            XmlNode root = XmlParser.CreateRootTag(xmlDocument, AudioConstants.XML_ROOT);
 
 			XmlNode defaultNode = xmlDocument.CreateElement ("AudioSettings");
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "useMusic", defaultSetting.useMusic.ToString ());
@@ -278,16 +279,8 @@ namespace AEngine.Audio
 				}
 			} else
 				return;
-
-			if (saveAdditionalToResources) {
-				if (!Directory.Exists ("Assets/Resources/" + BaseEngineConstants.AudioConfigurationPath))
-					Directory.CreateDirectory ("Assets/Resources/" + BaseEngineConstants.AudioConfigurationPath);
-								
-				XmlDataParser.SaveXmlDocumentToResources (xmlDocument, BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName);
-			}
-
-            //XmlDataParser.SaveXmlDocumentToProject (xmlDocument, BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName);
-            xmlDocument.Save(AudioConstants.GetFullConfigurationPath());
+                        
+            xmlDocument.Save(AudioConstants.GetResourcesPath());
 
 			AssetDatabase.Refresh ();
 		}

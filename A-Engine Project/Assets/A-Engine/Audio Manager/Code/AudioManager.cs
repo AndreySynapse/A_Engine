@@ -1,10 +1,12 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
+using System.IO;
+using UnityEngine;
+using AEngine.Parser;
 
-namespace AEngine
+namespace AEngine.Audio
 {
-    public class AudioManager : MonoBehaviour
+    public class AudioManager : MonoSingleton<AudioManager>
     {
 		private enum AudioState
 		{
@@ -97,9 +99,9 @@ namespace AEngine
         {	
 			if (audioBlock.name == blockName)
 				return false;
-
-			XmlDocument xmlDocument = XmlDataParser.LoadXmlDocumentFromResources (BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName);
-			XmlNode rootNode = XmlDataParser.FindUniqueTag (xmlDocument, "AudioData");
+            
+            XmlDocument xmlDocument = XmlParser.LoadFromResources(AudioConstants.GetReadableRuntimeResourcesPath());
+            XmlNode rootNode = XmlParser.GetRootTag(xmlDocument, AudioConstants.XML_ROOT);
 			
 			if (!XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioBlock"))
 				return false;
@@ -349,24 +351,30 @@ namespace AEngine
 		{		
 			XmlDocument xmlDocument;
 			bool needSave = false;
-
-			if (!XmlDataParser.ExistsXmlFile (BaseEngineConstants.BaseSettingsPath, BaseEngineConstants.AudioSettingsShortFileName)) {
-				if (!XmlDataParser.ExistsInResourcesXmlFile (BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName)) {
-					SaveAudioSettings ();
-					xmlDocument = XmlDataParser.LoadXmlDocumentFromFile (BaseEngineConstants.BaseSettingsPath, BaseEngineConstants.AudioSettingsShortFileName);
-				} else {
-					xmlDocument = XmlDataParser.LoadXmlDocumentFromResources (BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName);
-					needSave = true;
+                        
+            if (!File.Exists(AudioConstants.GetCachePath()))
+            {
+                if (!File.Exists(AudioConstants.GetResourcesPath()))
+                {
+                    SaveAudioSettings ();
+                    xmlDocument = XmlParser.LoadFromFile(AudioConstants.GetCachePath());
+                    Debug.LogError("Couldn't find configuration file in resources");
+                } else
+                {
+                    xmlDocument = XmlParser.LoadFromResources(AudioConstants.GetReadableRuntimeResourcesPath());
+                    needSave = true;
 				}
-			} else {
-				xmlDocument = XmlDataParser.LoadXmlDocumentFromFile (BaseEngineConstants.BaseSettingsPath, BaseEngineConstants.AudioSettingsShortFileName);
+			} else
+            {
+                xmlDocument = XmlParser.LoadFromFile(AudioConstants.GetCachePath());
 			}
 
-			if (!XmlDataParser.IsAnyTagExist (xmlDocument, "AudioData")) {
+			if (!XmlParser.IsExistRootTag(xmlDocument, AudioConstants.XML_ROOT))
+            {
 				Debug.Log ("AudioData not founded"); 
 				return;
 			}
-			XmlNode rootNode = XmlDataParser.FindUniqueTag (xmlDocument, "AudioData");
+			XmlNode rootNode = XmlParser.GetRootTag(xmlDocument, AudioConstants.XML_ROOT);
 
 			if (!XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioSettings")) {
 				Debug.Log ("AudioSettings  not founded"); 
@@ -386,7 +394,7 @@ namespace AEngine
 		private void SaveAudioSettings ()
 		{
 			XmlDocument xmlDocument = new XmlDocument ();
-			XmlNode rootNode = XmlDataParser.CreateRootNode (xmlDocument, "AudioData");
+            XmlNode rootNode = XmlParser.CreateRootTag(xmlDocument, AudioConstants.XML_ROOT);
 
 			XmlNode audioNode = xmlDocument.CreateElement ("AudioSettings");
 			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "useMusic", isMusic.ToString ());
@@ -394,21 +402,23 @@ namespace AEngine
 			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "useSound", isSound.ToString ());
 			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "soundVolume", soundVolumme.ToString ());
 			rootNode.AppendChild (audioNode);
-			
-			XmlDataParser.SaveXmlDocument (xmlDocument, BaseEngineConstants.BaseSettingsPath, BaseEngineConstants.AudioSettingsShortFileName);
+                        
+            if (!Directory.Exists(Path.GetDirectoryName(AudioConstants.GetCachePath())))
+                Directory.CreateDirectory(Path.GetDirectoryName(AudioConstants.GetCachePath()));
+            xmlDocument.Save(AudioConstants.GetCachePath());
 		}
-
+                
 		private void LoadAudioConfiguration ()
 		{
 			// Default settings
 			maxSoundSourceCount = 3;
 			fadeTime = 0;
 			fadeOn = false;
-
-			if (!XmlDataParser.ExistsInResourcesXmlFile (BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName))
+            
+            if (!File.Exists(AudioConstants.GetResourcesPath()))
 				return;
-
-			XmlDocument xmlDocument = XmlDataParser.LoadXmlDocumentFromResources (BaseEngineConstants.AudioConfigurationPath, BaseEngineConstants.AudioConfigurationShortFileName);
+            
+            XmlDocument xmlDocument = XmlParser.LoadFromResources(AudioConstants.GetReadableRuntimeResourcesPath());
 			XmlNode rootNode = XmlDataParser.FindUniqueTag (xmlDocument, "AudioData");
 
 			if (!XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioConfiguration"))

@@ -12,7 +12,7 @@ namespace AEngine.Audio
         {
             XmlDocument xmlDocument;
 
-            string path = AudioConstants.GetFullConfigurationPath();
+            string path = AudioConstants.GetResourcesPath();
             CheckDirectory(Path.GetDirectoryName(path));
             
             if (!File.Exists(path))
@@ -23,14 +23,14 @@ namespace AEngine.Audio
                 xmlDocument.Save(path);
             }
             
-            xmlDocument = XmlParser.LoadFromFile(AudioConstants.GetFullConfigurationPath());
+            xmlDocument = XmlParser.LoadFromFile(AudioConstants.GetResourcesPath());
                                     
             return xmlDocument;
         }
 
         public void Save(XmlDocument xmlDocument)
         {
-            string path = Path.GetDirectoryName(AudioConstants.GetFullConfigurationPath());
+            string path = Path.GetDirectoryName(AudioConstants.GetResourcesPath());
 
             CheckDirectory(path);
 

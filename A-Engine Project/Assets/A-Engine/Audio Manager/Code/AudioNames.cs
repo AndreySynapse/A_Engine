@@ -9,11 +9,11 @@ namespace AEngine
 
 	public enum ESound
 	{
-		Tap
+		
 	}
 
 	public enum EMusic
 	{
-		
+		GameMusic1
 	}
 }

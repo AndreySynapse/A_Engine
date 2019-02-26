@@ -2,7 +2,6 @@
 
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System;
 
 namespace AEngine

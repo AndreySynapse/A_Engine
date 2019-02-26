@@ -1,1 +1,9 @@
-<AudioData />
+<AudioData>
+  <AudioSettings useMusic="True" musicVolume="1" useSound="True" soundVolume="1" />
+  <AudioConfiguration SoundSourceCount="3" fade="0" fadeOn="False" />
+  <AudioBlock Name="NewBlock">
+    <Music MusicNotReplyLength="1">
+      <Track Name="GameMusic1" Path="AudioResources/Music/GameMusic1" Volume="1" />
+    </Music>
+  </AudioBlock>
+</AudioData>

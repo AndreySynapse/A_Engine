@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace AEngine.Audio
+namespace AEngine.Audioppp
 {
     public enum FadeMods
     {
@@ -23,7 +23,7 @@ namespace AEngine.Audio
         public float _startMusicDelay;
         public bool _enableMusic;
 
-        public AudioTrack _track;
+        //public AudioTrack _track;
         
         protected override void Init()
         {
