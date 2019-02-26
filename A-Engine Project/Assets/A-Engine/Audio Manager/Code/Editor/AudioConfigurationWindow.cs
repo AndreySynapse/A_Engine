@@ -13,7 +13,8 @@ namespace AEngine.Audio
 	[Serializable]
 	public class AudioConfigurationWindow : EditorWindow
 	{
-        private DefaultAudioSettings defaultSetting;
+        private GeneralAudioSettings _generalAudioSettings;
+
 		private Dictionary<string, AudioBlock> audioData;
 		private float fadeTime;
 		private bool useFadeOn;
@@ -24,8 +25,8 @@ namespace AEngine.Audio
 
 		void OnEnable()
 		{			
-			if (defaultSetting == null)
-				defaultSetting = new DefaultAudioSettings ();
+			if (_generalAudioSettings == null)
+                _generalAudioSettings = new GeneralAudioSettings();
 
             XmlDocument doc = AudioDataParser.Load();
             AssetDatabase.Refresh();
@@ -38,11 +39,11 @@ namespace AEngine.Audio
 		void OnGUI()
 		{
 			scrollPosition = GUILayout.BeginScrollView (scrollPosition);
-                        
+            
             Color defaultColor = GUI.color;
 			GUILayout.Space (9);
-
-			defaultSetting.DrawGUI ();
+            
+            _generalAudioSettings.DrawGUI();
 			GUILayout.Space (12);
 
 			EditorGUILayout.BeginHorizontal ();
@@ -225,10 +226,7 @@ namespace AEngine.Audio
             XmlNode rootNode = XmlParser.GetRootTag(xmlDocument, AudioConstants.XML_ROOT);
 			if (XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioSettings")) {
 				XmlNode defaultNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioSettings");
-				defaultSetting.useMusic = bool.Parse(defaultNode.Attributes ["useMusic"].Value);
-				defaultSetting.musicVolume = float.Parse (defaultNode.Attributes ["musicVolume"].Value);
-				defaultSetting.useSound = bool.Parse(defaultNode.Attributes ["useSound"].Value);
-				defaultSetting.soundVolume = float.Parse (defaultNode.Attributes ["soundVolume"].Value);
+                _generalAudioSettings.Load(defaultNode);
 			}
 
 			if (XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioConfiguration")) {
@@ -259,11 +257,9 @@ namespace AEngine.Audio
             XmlNode root = XmlParser.CreateRootTag(xmlDocument, AudioConstants.XML_ROOT);
 
 			XmlNode defaultNode = xmlDocument.CreateElement ("AudioSettings");
-			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "useMusic", defaultSetting.useMusic.ToString ());
-			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "musicVolume", defaultSetting.musicVolume.ToString ());
-			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "useSound", defaultSetting.useSound.ToString ());
-			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "soundVolume", defaultSetting.soundVolume.ToString ());
-			root.AppendChild (defaultNode);
+            _generalAudioSettings.Save(xmlDocument, defaultNode);
+
+            root.AppendChild (defaultNode);
 
 			defaultNode = xmlDocument.CreateElement ("AudioConfiguration");
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "SoundSourceCount", soundSourceCount.ToString());	
@@ -328,9 +324,9 @@ namespace AEngine.Audio
 
 		private void SaveNamesInCode()
 		{
-			CodeManager.ClearBlock(BaseEngineConstants.AudioNamesFileName, "", BaseEngineConstants.AudioNamesEnumForBlocks, 1);
-			CodeManager.ClearBlock(BaseEngineConstants.AudioNamesFileName, "", BaseEngineConstants.AudioNamesEnumForSounds, 1);
-			CodeManager.ClearBlock(BaseEngineConstants.AudioNamesFileName, "", BaseEngineConstants.AudioNamesEnumForMusics, 1);
+			CodeManager.ClearBlock(AudioConstants.CODE_PARSER_FILE_NAME, "", AudioConstants.CODE_PARSER_THEMES_ENUM, 1);
+			CodeManager.ClearBlock(AudioConstants.CODE_PARSER_FILE_NAME, "", AudioConstants.CODE_PARSER_SOUNDS_ENUM, 1);
+			CodeManager.ClearBlock(AudioConstants.CODE_PARSER_FILE_NAME, "", AudioConstants.CODE_PARSER_MUSICS_ENUM, 1);
 
 			List<string> blocks = new List<string>();
 			List<string> sounds = new List<string>();
@@ -342,9 +338,9 @@ namespace AEngine.Audio
 				JoinItemsToList(musics, data.Value.music.GetTracksNames());
 			}
 
-			CodeManager.AddItemsToBlock(BaseEngineConstants.AudioNamesFileName, "", BaseEngineConstants.AudioNamesEnumForBlocks, blocks.ToArray(), 1);
-			CodeManager.AddItemsToBlock(BaseEngineConstants.AudioNamesFileName, "", BaseEngineConstants.AudioNamesEnumForSounds, sounds.ToArray(), 1);
-			CodeManager.AddItemsToBlock(BaseEngineConstants.AudioNamesFileName, "", BaseEngineConstants.AudioNamesEnumForMusics, musics.ToArray(), 1);
+			CodeManager.AddItemsToBlock(AudioConstants.CODE_PARSER_FILE_NAME, "", AudioConstants.CODE_PARSER_THEMES_ENUM, blocks.ToArray(), 1);
+			CodeManager.AddItemsToBlock(AudioConstants.CODE_PARSER_FILE_NAME, "", AudioConstants.CODE_PARSER_SOUNDS_ENUM, sounds.ToArray(), 1);
+			CodeManager.AddItemsToBlock(AudioConstants.CODE_PARSER_FILE_NAME, "", AudioConstants.CODE_PARSER_MUSICS_ENUM, musics.ToArray(), 1);
 		}
 
 		private void JoinItemsToList(List<string> baseList, List<string> sourceList)

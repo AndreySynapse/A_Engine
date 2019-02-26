@@ -8,10 +8,30 @@ namespace AEngine
 {
 	public static class ACodeTool
 	{
-		public static string GetEngineRootDirectory(bool useShortVariation)
+        private const string ENGINE_NAME = "A-Engine";
+
+        public static string GetEngineRootDirectory(bool shortUnityPath)
+        {
+            string[] directories = Directory.GetDirectories(Application.dataPath, ENGINE_NAME, SearchOption.AllDirectories);
+
+            if (directories == null || directories.Length == 0)
+            {
+                Debug.Log("Couldn't fine A-Engine root directory");
+                return null;
+            }
+
+            string result = directories[0];
+
+            if (shortUnityPath && !string.IsNullOrEmpty(result))
+            {
+                result = result.Substring(result.IndexOf("Assets")) + "/";
+            }
+
+            return result;            
+        }
+
+		public static string GetEngineMenuRootDirectory(bool useShortVariation)
 		{
-			const string ENGINE_NAME = "A-Engine";
-			
 			string[] directories = Directory.GetDirectories(Application.dataPath, ENGINE_NAME, SearchOption.AllDirectories);
 
 			if (directories.IsNullOrEmpty())

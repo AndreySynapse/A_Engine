@@ -1,6 +1,7 @@
 ﻿// A-Engine, Code version: 1
 
 #if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -23,4 +24,5 @@ namespace AEngine.EditorTools
         }
     }
 }
+
 #endif

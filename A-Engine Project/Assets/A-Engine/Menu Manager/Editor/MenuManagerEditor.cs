@@ -47,11 +47,11 @@ namespace AEngine.Menu
 
 			if (_btnUpTex == null)
 			{
-				_btnUpTex = AssetDatabase.LoadAssetAtPath<Texture2D>(ACodeTool.GetEngineRootDirectory(true) + "Menu Manager/Resources/Textures/up.png") as Texture2D;
+				_btnUpTex = AssetDatabase.LoadAssetAtPath<Texture2D>(ACodeTool.GetEngineMenuRootDirectory(true) + "Menu Manager/Resources/Textures/up.png") as Texture2D;
 			}
 			if (_btnDownTex == null) 
 			{
-				_btnDownTex = AssetDatabase.LoadAssetAtPath<Texture2D>(ACodeTool.GetEngineRootDirectory(true) + "Menu Manager/Resources/Textures/down.png") as Texture2D;
+				_btnDownTex = AssetDatabase.LoadAssetAtPath<Texture2D>(ACodeTool.GetEngineMenuRootDirectory(true) + "Menu Manager/Resources/Textures/down.png") as Texture2D;
 			}
 
 			if (_sortModule == null)

@@ -1,5 +1,5 @@
 <AudioData>
-  <AudioSettings useMusic="True" musicVolume="1" useSound="True" soundVolume="1" />
+  <AudioSettings UseMusic="True" UseSound="True" MusicVolume="0,321" SoundVolume="1" MusicCompressedVolume="1" SoundCompressedVolume="1" />
   <AudioConfiguration SoundSourceCount="3" fade="0" fadeOn="False" />
   <AudioBlock Name="NewBlock">
     <Music MusicNotReplyLength="1">

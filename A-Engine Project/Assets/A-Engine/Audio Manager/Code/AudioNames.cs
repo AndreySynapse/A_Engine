@@ -1,18 +1,18 @@
 // A-Engine, Code version: 1
 
-namespace AEngine
+namespace AEngine.Audio
 {
-	public enum EAudioBlock
+	public enum AudioThemes
 	{
 		NewBlock
 	}
 
-	public enum ESound
+	public enum Sounds
 	{
 		
 	}
 
-	public enum EMusic
+	public enum Musics
 	{
 		GameMusic1
 	}

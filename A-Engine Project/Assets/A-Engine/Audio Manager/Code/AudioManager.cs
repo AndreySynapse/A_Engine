@@ -15,47 +15,45 @@ namespace AEngine.Audio
 			FadeOnForNewMusic = 2
 		}
 		private AudioState state;
-
-        private bool isMusic = true;
+                
         public bool IsMusic
         {
-            get { return isMusic; }
+            get { return _generalAudioSettings.UseMusic; }
             set
             {
-                if (isMusic != value) {
-					isMusic = value;
-					SaveAudioSettings ();
-					if (isMusic)
-						PlayMusic ();
+                if (_generalAudioSettings.UseMusic != value)
+                {
+                    _generalAudioSettings.UseMusic = value;
+                    SaveAudioSettings ();
+					if (_generalAudioSettings.UseMusic)
+						PlayMusic();
                 }				              
             }
         }
 
-		private float musicVolumme = 1;
-		public float MusicVolumme
-		{
-			get { return musicVolumme; }
-			set { musicVolumme = value; }
-		}
-
-        private bool isSound = true;
         public bool IsSound
         {
-            get { return isSound; }
+            get { return _generalAudioSettings.UseSound; }
             set
             {
-				if (isSound != value) {
-					isSound = value;
-					SaveAudioSettings ();                
-				}
+                if (_generalAudioSettings.UseSound != value)
+                {
+                    _generalAudioSettings.UseSound = value;
+                    SaveAudioSettings();
+                }
             }
         }
-
-		private float soundVolumme = 1;
-		public float SoundVolumme
+        
+		public float MusicVolumme
 		{
-			get { return soundVolumme; }
-			set { soundVolumme = value; }
+			get { return _generalAudioSettings.MusicVolume; }
+			set { _generalAudioSettings.MusicVolume = value; }
+		}
+
+        public float SoundVolumme
+		{
+			get { return _generalAudioSettings.SoundVolume; }
+			set { _generalAudioSettings.SoundVolume = value; }
 		}
 
 		private int maxSoundSourceCount;
@@ -71,8 +69,12 @@ namespace AEngine.Audio
 		private float musicTrackVolume;
 		private string nextTrackName;
 
+        private GeneralAudioSettings _generalAudioSettings;
+
         void Awake()
         {
+            _generalAudioSettings = new GeneralAudioSettings();
+
 			LoadAudioSettings ();
 			LoadAudioConfiguration ();
 
@@ -117,14 +119,14 @@ namespace AEngine.Audio
 			return true;
         }
 
-		public bool LoadAudioBlock(EAudioBlock block)
+		public bool LoadAudioBlock(AudioThemes block)
 		{
 			return LoadAudioBlock(block.ToString());
 		}
 
 		public void PlayMusic (bool fade = false)
 		{
-			if (!isMusic)
+			if (!_generalAudioSettings.UseMusic)
 				return;
 
 			if (fade && fadeTime > 0) {
@@ -132,22 +134,22 @@ namespace AEngine.Audio
 				return;
 			}
 
-			audioBlock.PlayRandomMusic (musicSource, musicVolumme);
+			audioBlock.PlayRandomMusic (musicSource, _generalAudioSettings.MusicVolume);
 			musicTrackVolume = musicSource.volume;
 			delay = audioBlock.music.delay;
 		}
 
 		public void PlayMusic (string trackName)
 		{
-			if (!isMusic)
+			if (!_generalAudioSettings.UseMusic)
 				return;
 
-			audioBlock.PlayMusic (musicSource, trackName, musicVolumme);
+			audioBlock.PlayMusic (musicSource, trackName, _generalAudioSettings.MusicVolume);
 			musicTrackVolume = musicSource.volume;
 			delay = audioBlock.music.delay;
 		}
 
-		public void PlayMusic (EMusic musicTrack)
+		public void PlayMusic (Musics musicTrack)
 		{
 			PlayMusic(musicTrack.ToString());
 		}
@@ -162,7 +164,7 @@ namespace AEngine.Audio
 			return false;
 		}
 
-		public bool IsPlayingSound (ESound soundTrack)
+		public bool IsPlayingSound (Sounds soundTrack)
 		{
 			return IsPlayingSound(soundTrack.ToString());
 		}
@@ -177,7 +179,7 @@ namespace AEngine.Audio
 			}
 		}
 
-		public void PlayUniqueSound (params ESound[] soundTracks)
+		public void PlayUniqueSound (params Sounds[] soundTracks)
 		{
 			for (int i = 0; i < soundTracks.Length; i++) {
 				if (!IsPlayingSound (soundTracks[i])) {
@@ -193,7 +195,7 @@ namespace AEngine.Audio
 			PlaySound (soundNames[index]);
 		}
 
-		public void PlayRandomSound (params ESound[] soundTracks)
+		public void PlayRandomSound (params Sounds[] soundTracks)
 		{
 			int index = Random.Range (0, soundTracks.Length);
 			PlaySound (soundTracks[index]);
@@ -201,7 +203,7 @@ namespace AEngine.Audio
 
 		public void PlaySound(string soundName, bool dontPlayIfSameIsPlaying = false)
 		{
-			if (!isSound)
+			if (!_generalAudioSettings.UseSound)
 				return;
 
 			if (dontPlayIfSameIsPlaying && IsPlayingSound (soundName))
@@ -222,17 +224,17 @@ namespace AEngine.Audio
 					index = 0;				
 			}
 
-			audioBlock.PlaySoundTrack (soundSource [index], soundName, soundVolumme);
+			audioBlock.PlaySoundTrack (soundSource [index], soundName, _generalAudioSettings.SoundVolume);
 		}
 
-		public void PlaySound (ESound soundTrack, bool dontPlayIfSameIsPlaying = false)
+		public void PlaySound (Sounds soundTrack, bool dontPlayIfSameIsPlaying = false)
 		{
 			PlaySound(soundTrack.ToString(), dontPlayIfSameIsPlaying);
 		}
 
 		public void StopSound (string soundName)
 		{
-			if (!isSound)
+			if (!_generalAudioSettings.UseSound)
 				return;
 			
 			for (int i = 0; i < soundSource.Count; i++) {
@@ -243,15 +245,16 @@ namespace AEngine.Audio
 			}
 		}
 
-		public void StopSound(ESound soundTrack)
+		public void StopSound(Sounds soundTrack)
 		{
 			StopSound(soundTrack.ToString());
 		}
 
-		void Update ()
+		void Update()
 		{
-			if (musicSource.isPlaying) {
-				if (!isMusic) {
+			if (musicSource.isPlaying)
+            {
+				if (!_generalAudioSettings.UseMusic) {
 					if (Fade (false))
 						musicSource.Stop ();
 				}
@@ -260,7 +263,7 @@ namespace AEngine.Audio
 					return;
 			}
 
-			if (!isMusic)
+			if (!_generalAudioSettings.UseMusic)
 				return;
 			
 			if (state == AudioState.FadeOffForNewMusic) {
@@ -268,7 +271,7 @@ namespace AEngine.Audio
 					if (Fade (false)) {
 						if (fadeOn) {
 							nextTrackName = audioBlock.GetRandomMusic ();
-							musicTrackVolume = musicVolumme * audioBlock.music.tracks [nextTrackName].Volume;
+							musicTrackVolume = _generalAudioSettings.MusicVolume * audioBlock.music.tracks [nextTrackName].Volume;
 							audioBlock.PlayMusic (musicSource, nextTrackName, 0);
 							state = AudioState.FadeOnForNewMusic;
 							return;
@@ -280,7 +283,7 @@ namespace AEngine.Audio
 				} else {
 					if (fadeOn) {
 						nextTrackName = audioBlock.GetRandomMusic ();
-						musicTrackVolume = musicVolumme * audioBlock.music.tracks [nextTrackName].Volume;
+						musicTrackVolume = _generalAudioSettings.MusicVolume * audioBlock.music.tracks [nextTrackName].Volume;
 						audioBlock.PlayMusic (musicSource, nextTrackName, 0);
 						state = AudioState.FadeOnForNewMusic;
 						return;
@@ -381,13 +384,11 @@ namespace AEngine.Audio
 				return;
 			}
 			XmlNode audioNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioSettings");
-
-			isMusic = bool.Parse (audioNode.Attributes ["useMusic"].Value);
-			musicVolumme = float.Parse (audioNode.Attributes ["musicVolume"].Value);
-			isSound = bool.Parse (audioNode.Attributes ["useSound"].Value);
-			soundVolumme = float.Parse (audioNode.Attributes ["soundVolume"].Value);
-
-			if (needSave)
+                        
+            _generalAudioSettings.Load(audioNode);
+            _generalAudioSettings.SoundVolume = _generalAudioSettings.SoundVolume;
+            
+            if (needSave)
 				SaveAudioSettings ();
 		}
 
@@ -397,10 +398,7 @@ namespace AEngine.Audio
             XmlNode rootNode = XmlParser.CreateRootTag(xmlDocument, AudioConstants.XML_ROOT);
 
 			XmlNode audioNode = xmlDocument.CreateElement ("AudioSettings");
-			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "useMusic", isMusic.ToString ());
-			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "musicVolume", musicVolumme.ToString ());
-			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "useSound", isSound.ToString ());
-			XmlDataParser.AddAttributeToNode (xmlDocument, audioNode, "soundVolume", soundVolumme.ToString ());
+            _generalAudioSettings.Save(xmlDocument, audioNode);
 			rootNode.AppendChild (audioNode);
                         
             if (!Directory.Exists(Path.GetDirectoryName(AudioConstants.GetCachePath())))
@@ -429,5 +427,58 @@ namespace AEngine.Audio
 			fadeTime = float.Parse(configNode.Attributes ["fade"].Value);
 			fadeOn = bool.Parse (configNode.Attributes ["fadeOn"].Value);
 		}
+
+        /*
+        public enum FadeMods
+        {
+           NotFading,
+           FadeOut,
+           FadeIn,
+           FadeInOut,
+           CrossMusicAndFullFade
+        }
+          
+        #region Interface
+        public string PlayingMusicName { get; set; }
+
+        public string[] PlayingSoundNames { get; set; }
+
+        public void LoadTheme() { }
+
+        public void LoadSubTheme() { }
+
+        public void ClearSubTheme() { }
+
+
+        public void PlayMusic() { }
+
+        public void PlayMusic(FadeMods fadeMode) { }
+
+
+        public void PlaySound(string soundName) { }
+
+        public void PlayRandomSound(string soundName) { }
+
+        public void PlayClampSound() { }
+
+        public void PlayRandomClampSound() { }
+
+        public void PlaySoundAsMusic() { }
+
+        public bool IsPlayingSound() { return false; }
+
+        public void StopSound() { }
+
+        public void StopSounds() { }
+
+        public void StopAllSounds() { }
+
+
+        public void PlayMonoSound() { }
+
+        public void StopMonoSound() { }
+        #endregion
+        */
+
     }
 }

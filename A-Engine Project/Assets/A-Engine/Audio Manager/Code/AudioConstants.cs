@@ -10,7 +10,19 @@ namespace AEngine.Audio
         public const string FILE_NAME = "AudioConfiguration";
         public const string EXTENSION = "xml";
 
+        public const string CODE_PARSER_FILE_NAME = "AudioNames.cs";
+        public const string CODE_PARSER_THEMES_ENUM = "AudioThemes";
+        public const string CODE_PARSER_SOUNDS_ENUM = "Sounds";
+        public const string CODE_PARSER_MUSICS_ENUM = "Musics";
+
         public const string XML_ROOT = "AudioData";
+        public const string XML_ATTRIBUTE_USE_MUSIC = "UseMusic";
+        public const string XML_ATTRIBUTE_USE_SOUND = "UseSound";
+        public const string XML_ATTRIBUTE_MUSIC_VOLUME = "MusicVolume";
+        public const string XML_ATTRIBUTE_SOUND_VOLUME = "SoundVolume";
+        public const string XML_ATTRIBUTE_MUSIC_COMPRESSED_VOLUME = "MusicCompressedVolume";
+        public const string XML_ATTRIBUTE_SOUND_COMPRESSED_VOLUME = "SoundCompressedVolume";
+
 
         #region Interface
         public static string GetCachePath()
