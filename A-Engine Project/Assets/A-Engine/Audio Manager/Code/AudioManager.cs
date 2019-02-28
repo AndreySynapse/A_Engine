@@ -6,6 +6,15 @@ using AEngine.Parser;
 
 namespace AEngine.Audio
 {
+    public enum FadeMods
+    {
+        NotFading,
+        FadeOut,
+        FadeIn,
+        FadeInOut,
+        FullFadeCrossMusic
+    }
+
     public class AudioManager : MonoSingleton<AudioManager>
     {
 		private enum AudioState
@@ -59,7 +68,6 @@ namespace AEngine.Audio
         private float MaxRealMusicVolume { get { return _generalAudioSettings.CompressedMusicVolume * _runtimeAudioSettings.MusicVolume; } }
         private float MaxRealSoundVolume { get { return _generalAudioSettings.CompressedSoundVolume * _runtimeAudioSettings.SoundVolume; } }
 
-		private int maxSoundSourceCount;
 		private float fadeTime;
 		private bool fadeOn;
 
@@ -215,14 +223,18 @@ namespace AEngine.Audio
 				return;
 			
 			int index = -1;
-			for (int i = 0; i < soundSource.Count; i++) {
-				if (!soundSource [i].isPlaying) {
+			for (int i = 0; i < soundSource.Count; i++)
+            {
+				if (!soundSource [i].isPlaying)
+                {
 					index = i;
 					break;
 				}
 			}
-			if (index == -1) {
-				if (soundSource.Count < maxSoundSourceCount) {
+			if (index == -1)
+            {
+				if (soundSource.Count < _generalAudioSettings.MaxSoundSources)
+                {
 					soundSource.Add (AddAudioSource ());
 					index = soundSource.Count - 1;
 				} else
@@ -417,7 +429,6 @@ namespace AEngine.Audio
 		private void LoadAudioConfiguration ()
 		{
 			// Default settings
-			maxSoundSourceCount = 3;
 			fadeTime = 0;
 			fadeOn = false;
             
@@ -432,7 +443,6 @@ namespace AEngine.Audio
 
 			XmlNode configNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioConfiguration");
             _generalAudioSettings.Load(configNode);
-			maxSoundSourceCount = int.Parse (configNode.Attributes ["SoundSourceCount"].Value);	
 			fadeTime = float.Parse(configNode.Attributes ["fade"].Value);
 			fadeOn = bool.Parse (configNode.Attributes ["fadeOn"].Value);
 		}

@@ -75,8 +75,6 @@ namespace AEngine.Audio
 
                 EditorGUILayout.EndHorizontal();
                 
-                GUILayout.Space(3f);
-                
                 // Sound block
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(CONTENT_OFFSET);
@@ -88,6 +86,8 @@ namespace AEngine.Audio
                 this.SoundVolume = EditorGUILayout.Slider(this.SoundVolume, 0f, 1f, GUILayout.Width(INPUT_SLIDER_WIDHT));
 
                 EditorGUILayout.EndHorizontal();
+                
+                GUILayout.Space(10f);
             }
         }
 #endif

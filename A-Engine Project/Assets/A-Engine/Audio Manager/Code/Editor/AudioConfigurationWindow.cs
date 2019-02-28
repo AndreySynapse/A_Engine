@@ -19,7 +19,7 @@ namespace AEngine.Audio
 		private Dictionary<string, AudioBlock> audioData;
 		private float fadeTime;
 		private bool useFadeOn;
-		private int soundSourceCount = 3;
+		
 		private Vector2 scrollPosition;
 
         private Texture2D _gearIcon;
@@ -59,28 +59,14 @@ namespace AEngine.Audio
             DrawImage(_gearIcon, 20f, 20f, 10f, 0f);
             EditorGUILayout.EndHorizontal();
 
-            GUILayout.Space(9);
-
+            GUILayout.Space(12);
 
 
             _runtimeAudioSettings.Draw();
-
-			GUILayout.Space (12);
-
-            _generalAudioSettings.DrawGUI();
+			_generalAudioSettings.DrawGUI();
 
             GUILayout.Space(12);
-
-            EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField ("Audio configuration", EditorStyles.boldLabel);
-			EditorGUILayout.EndHorizontal ();
-
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField ("Max sound source count", GUILayout.Width (180));
-			soundSourceCount = EditorGUILayout.IntField (soundSourceCount, GUILayout.Width (120));
-			if (soundSourceCount < 1)
-				soundSourceCount = 1;
-			EditorGUILayout.EndHorizontal ();
+                        
 			EditorGUILayout.BeginHorizontal ();
 			EditorGUILayout.LabelField ("Fade time", GUILayout.Width (180));
 			fadeTime = EditorGUILayout.FloatField (fadeTime, GUILayout.Width (120));
@@ -268,7 +254,7 @@ namespace AEngine.Audio
 			if (XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioConfiguration")) {
 				XmlNode configNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioConfiguration");
                 _generalAudioSettings.Load(configNode);
-                soundSourceCount = int.Parse (configNode.Attributes ["SoundSourceCount"].Value);	
+                //soundSourceCount = int.Parse (configNode.Attributes ["SoundSourceCount"].Value);	
 				fadeTime = float.Parse(configNode.Attributes ["fade"].Value);
 				useFadeOn = bool.Parse (configNode.Attributes ["fadeOn"].Value);
 			}
@@ -300,7 +286,7 @@ namespace AEngine.Audio
 
 			defaultNode = xmlDocument.CreateElement ("AudioConfiguration");
             _generalAudioSettings.Save(xmlDocument, defaultNode);
-			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "SoundSourceCount", soundSourceCount.ToString());	
+			//XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "SoundSourceCount", soundSourceCount.ToString());	
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "fade", fadeTime.ToString ());
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "fadeOn", useFadeOn.ToString ());
 			root.AppendChild (defaultNode);

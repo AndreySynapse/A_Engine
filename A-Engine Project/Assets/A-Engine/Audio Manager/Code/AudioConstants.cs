@@ -23,8 +23,8 @@ namespace AEngine.Audio
         public const string XML_ATTRIBUTE_SOUND_VOLUME = "SoundVolume";
         public const string XML_ATTRIBUTE_MUSIC_COMPRESSED_VOLUME = "MusicCompressedVolume";
         public const string XML_ATTRIBUTE_SOUND_COMPRESSED_VOLUME = "SoundCompressedVolume";
-
-
+        public const string XML_ATTRIBUTE_SOUND_SOURCES_COUNT = "SoundSourceCount";
+        
         #region Interface
         public static string GetCachePath()
         {
