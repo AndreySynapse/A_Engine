@@ -1,6 +1,6 @@
 <AudioData>
-  <AudioSettings UseMusic="True" UseSound="True" MusicVolume="0,321" SoundVolume="1" MusicCompressedVolume="1" SoundCompressedVolume="1" />
-  <AudioConfiguration SoundSourceCount="3" fade="0" fadeOn="False" />
+  <RuntimeChangableSettings UseMusic="True" UseSound="True" MusicVolume="1" SoundVolume="1" />
+  <AudioConfiguration MusicCompressedVolume="1" SoundCompressedVolume="1" SoundSourceCount="3" fade="0" fadeOn="False" />
   <AudioBlock Name="NewBlock">
     <Music MusicNotReplyLength="1">
       <Track Name="GameMusic1" Path="AudioResources/Music/GameMusic1" Volume="1" />

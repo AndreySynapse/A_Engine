@@ -13,6 +13,7 @@ namespace AEngine.Audio
 	[Serializable]
 	public class AudioConfigurationWindow : EditorWindow
 	{
+        private RuntimeChangableSettings _runtimeAudioSettings;
         private GeneralAudioSettings _generalAudioSettings;
 
 		private Dictionary<string, AudioBlock> audioData;
@@ -21,11 +22,20 @@ namespace AEngine.Audio
 		private int soundSourceCount = 3;
 		private Vector2 scrollPosition;
 
-		private List<string> namesList = new List<string> ();
+        private Texture2D _gearIcon;
+
+        private List<string> namesList = new List<string> ();
 
 		void OnEnable()
-		{			
-			if (_generalAudioSettings == null)
+		{
+            if (_gearIcon == null)
+            {
+                _gearIcon = AssetDatabase.LoadAssetAtPath<Texture2D>(ACodeTool.GetEngineRootDirectory(true) + "Audio Manager/Textures/GearIcon.png") as Texture2D;
+            }
+
+            if (_runtimeAudioSettings == null)
+                _runtimeAudioSettings = new RuntimeChangableSettings();
+            if (_generalAudioSettings == null)
                 _generalAudioSettings = new GeneralAudioSettings();
 
             XmlDocument doc = AudioDataParser.Load();
@@ -42,11 +52,26 @@ namespace AEngine.Audio
             
             Color defaultColor = GUI.color;
 			GUILayout.Space (9);
-            
-            _generalAudioSettings.DrawGUI();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(38f);
+            EditorGUILayout.LabelField("General audio settings", EditorStyles.boldLabel, GUILayout.Width(150f));
+            DrawImage(_gearIcon, 20f, 20f, 10f, 0f);
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(9);
+
+
+
+            _runtimeAudioSettings.Draw();
+
 			GUILayout.Space (12);
 
-			EditorGUILayout.BeginHorizontal ();
+            _generalAudioSettings.DrawGUI();
+
+            GUILayout.Space(12);
+
+            EditorGUILayout.BeginHorizontal ();
 			EditorGUILayout.LabelField ("Audio configuration", EditorStyles.boldLabel);
 			EditorGUILayout.EndHorizontal ();
 
@@ -150,6 +175,17 @@ namespace AEngine.Audio
 			EditorGUILayout.EndScrollView ();
 		}
 
+        private void DrawImage(Texture2D image, float width, float height, float x, float yOffset)
+        {
+            Rect rect = GUILayoutUtility.GetRect(width, height);
+            rect.width = width;
+            rect.height = height;
+            rect.x = x;
+            rect.y += yOffset;
+            
+            GUI.DrawTexture(rect, _gearIcon);
+        }
+
 		private void DrawTrackList (TrackList trackList, bool withSpecial)
 		{
 			if (trackList.IsFilled) {
@@ -224,14 +260,15 @@ namespace AEngine.Audio
 				audioData.Clear ();
 
             XmlNode rootNode = XmlParser.GetRootTag(xmlDocument, AudioConstants.XML_ROOT);
-			if (XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioSettings")) {
-				XmlNode defaultNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioSettings");
-                _generalAudioSettings.Load(defaultNode);
+			if (XmlDataParser.IsAnyTagInChildExist (rootNode, AudioConstants.XML_RUNTIME_TAG)) {
+				XmlNode defaultNode = XmlDataParser.FindUniqueTagInChild (rootNode, AudioConstants.XML_RUNTIME_TAG);
+                _runtimeAudioSettings.Load(defaultNode);
 			}
 
 			if (XmlDataParser.IsAnyTagInChildExist (rootNode, "AudioConfiguration")) {
 				XmlNode configNode = XmlDataParser.FindUniqueTagInChild (rootNode, "AudioConfiguration");
-				soundSourceCount = int.Parse (configNode.Attributes ["SoundSourceCount"].Value);	
+                _generalAudioSettings.Load(configNode);
+                soundSourceCount = int.Parse (configNode.Attributes ["SoundSourceCount"].Value);	
 				fadeTime = float.Parse(configNode.Attributes ["fade"].Value);
 				useFadeOn = bool.Parse (configNode.Attributes ["fadeOn"].Value);
 			}
@@ -256,12 +293,13 @@ namespace AEngine.Audio
 			XmlDocument xmlDocument = new XmlDocument ();
             XmlNode root = XmlParser.CreateRootTag(xmlDocument, AudioConstants.XML_ROOT);
 
-			XmlNode defaultNode = xmlDocument.CreateElement ("AudioSettings");
-            _generalAudioSettings.Save(xmlDocument, defaultNode);
+			XmlNode defaultNode = xmlDocument.CreateElement(AudioConstants.XML_RUNTIME_TAG);
+            _runtimeAudioSettings.Save(xmlDocument, defaultNode);
 
             root.AppendChild (defaultNode);
 
 			defaultNode = xmlDocument.CreateElement ("AudioConfiguration");
+            _generalAudioSettings.Save(xmlDocument, defaultNode);
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "SoundSourceCount", soundSourceCount.ToString());	
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "fade", fadeTime.ToString ());
 			XmlDataParser.AddAttributeToNode (xmlDocument, defaultNode, "fadeOn", useFadeOn.ToString ());

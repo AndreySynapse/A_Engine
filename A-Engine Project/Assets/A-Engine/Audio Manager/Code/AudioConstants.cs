@@ -16,6 +16,7 @@ namespace AEngine.Audio
         public const string CODE_PARSER_MUSICS_ENUM = "Musics";
 
         public const string XML_ROOT = "AudioData";
+        public const string XML_RUNTIME_TAG = "RuntimeChangableSettings";
         public const string XML_ATTRIBUTE_USE_MUSIC = "UseMusic";
         public const string XML_ATTRIBUTE_USE_SOUND = "UseSound";
         public const string XML_ATTRIBUTE_MUSIC_VOLUME = "MusicVolume";
