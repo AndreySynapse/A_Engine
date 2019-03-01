@@ -17,13 +17,15 @@ namespace AEngine.Audio
 
     public class AudioManager : MonoSingleton<AudioManager>
     {
-		private enum AudioState
+		private enum MusicStates
 		{
-			Default = 0,
-			FadeOffForNewMusic = 1,
-			FadeOnForNewMusic = 2
+			Default,
+            Stop,
+            Wait,
+			FadeOut,
+			FadeIn
 		}
-		private AudioState state;
+		private MusicStates _musicState;
                 
         public bool IsMusic
         {
@@ -82,7 +84,7 @@ namespace AEngine.Audio
 
         private RuntimeChangableSettings _runtimeAudioSettings;
         private GeneralAudioSettings _generalAudioSettings;
-
+                
         void Awake()
         {
             _runtimeAudioSettings = new RuntimeChangableSettings();
@@ -98,7 +100,7 @@ namespace AEngine.Audio
 			audioBlock = new AudioBlock ();
 			delay = 0;
 			_musicTrackVolume = 0;
-			state = AudioState.Default;
+			_musicState = MusicStates.Default;
         }
 
 		private AudioSource AddAudioSource ()
@@ -137,37 +139,7 @@ namespace AEngine.Audio
 			return LoadAudioBlock(block.ToString());
 		}
 
-		public void PlayMusic (bool fade = false)
-		{
-			if (!_runtimeAudioSettings.UseMusic)
-				return;
-
-			if (fade && fadeTime > 0) {
-				state = AudioState.FadeOffForNewMusic;
-				return;
-			}
-                        
-			audioBlock.PlayRandomMusic (musicSource, this.MaxRealMusicVolume);
-			_musicTrackVolume = musicSource.volume;
-			delay = audioBlock.music.delay;
-		}
-
-		public void PlayMusic (string trackName)
-		{
-			if (!_runtimeAudioSettings.UseMusic)
-				return;
-                        
-            audioBlock.PlayMusic (musicSource, trackName, this.MaxRealMusicVolume);
-			_musicTrackVolume = musicSource.volume;
-			delay = audioBlock.music.delay;
-		}
-
-		public void PlayMusic (Musics musicTrack)
-		{
-			PlayMusic(musicTrack.ToString());
-		}
-
-		public bool IsPlayingSound (string soundName)
+        public bool IsPlayingSound (string soundName)
 		{
 			for (int i = 0; i < soundSource.Count; i++) {
 				if (soundSource [i].isPlaying && soundSource [i].clip.name == soundName)
@@ -267,6 +239,108 @@ namespace AEngine.Audio
 			StopSound(soundTrack.ToString());
 		}
 
+        public void PlayMusic(FadeMods fadeMode, float duration)
+        {
+            if (!_runtimeAudioSettings.UseMusic)
+                return;
+
+            switch (_generalAudioSettings.FadeMode)
+            {
+                case FadeMods.NotFading:
+                    break;
+
+            }
+
+            audioBlock.PlayRandomMusic(musicSource, this.MaxRealMusicVolume);
+            _musicTrackVolume = musicSource.volume;
+            delay = audioBlock.music.delay;
+        }
+
+        public void PlayMusic()
+        {
+            PlayMusic(_generalAudioSettings.FadeMode, _generalAudioSettings.FadeDuration);
+        }
+
+        private void Update()
+        {
+            switch (_generalAudioSettings.FadeMode)
+            {
+                case FadeMods.NotFading:
+                    MusicPlayerDefaultMode();
+                    break;
+            }
+        }
+
+        private void MusicPlayerDefaultMode()
+        {
+            if (_musicState == MusicStates.Stop)
+                return;
+            
+            if (!_runtimeAudioSettings.UseMusic)
+            {
+                musicSource.Stop();
+                _musicState = MusicStates.Stop;
+                return;
+            }
+
+            if (!musicSource.isPlaying)
+            {
+                if (_musicState != MusicStates.Wait)
+                {
+                    delay = audioBlock.music.delay;
+                    _musicState = MusicStates.Wait;
+                }
+                else
+                {
+                    delay -= Time.unscaledDeltaTime;
+                    if (delay <= 0f)
+                    {
+                        PlayMusic();
+                        _musicState = MusicStates.Default;
+                    }
+                }
+            }
+            else
+            {
+                _musicState = MusicStates.Default;
+            }
+        }
+
+
+
+        /*
+		public void PlayMusic (bool fade = false)
+		{
+			if (!_runtimeAudioSettings.UseMusic)
+				return;
+
+			if (fade && fadeTime > 0) {
+				_musicState = MusicStates.FadeOut;
+				return;
+			}
+                        
+			audioBlock.PlayRandomMusic (musicSource, this.MaxRealMusicVolume);
+			_musicTrackVolume = musicSource.volume;
+			delay = audioBlock.music.delay;
+		}
+
+		public void PlayMusic (string trackName)
+		{
+			if (!_runtimeAudioSettings.UseMusic)
+				return;
+                        
+            audioBlock.PlayMusic (musicSource, trackName, this.MaxRealMusicVolume);
+			_musicTrackVolume = musicSource.volume;
+			delay = audioBlock.music.delay;
+		}
+
+		public void PlayMusic (Musics musicTrack)
+		{
+			PlayMusic(musicTrack.ToString());
+		}
+        */
+
+        /*
 		void Update()
 		{
 			if (musicSource.isPlaying)
@@ -276,25 +350,25 @@ namespace AEngine.Audio
 						musicSource.Stop ();
 				}
 
-				if (state == AudioState.Default)
+				if (_musicState == MusicStates.Default)
 					return;
 			}
 
 			if (!_runtimeAudioSettings.UseMusic)
 				return;
 			
-			if (state == AudioState.FadeOffForNewMusic) {
+			if (_musicState == MusicStates.FadeOut) {
 				if (musicSource.isPlaying) {
 					if (Fade (false)) {
 						if (fadeOn) {
 							nextTrackName = audioBlock.GetRandomMusic ();
 							_musicTrackVolume = this.MaxRealMusicVolume * audioBlock.music.tracks[nextTrackName].Volume;
 							audioBlock.PlayMusic (musicSource, nextTrackName, 0);
-							state = AudioState.FadeOnForNewMusic;
+							_musicState = MusicStates.FadeIn;
 							return;
 						}
 						PlayMusic ();
-						state = AudioState.Default;
+						_musicState = MusicStates.Default;
 						return;
 					}
 				} else {
@@ -302,17 +376,17 @@ namespace AEngine.Audio
 						nextTrackName = audioBlock.GetRandomMusic ();
 						_musicTrackVolume = this.MaxRealMusicVolume * audioBlock.music.tracks[nextTrackName].Volume;
 						audioBlock.PlayMusic (musicSource, nextTrackName, 0);
-						state = AudioState.FadeOnForNewMusic;
+						_musicState = MusicStates.FadeIn;
 						return;
 					}
-					state = AudioState.Default;
+					_musicState = MusicStates.Default;
 					PlayMusic ();
 					return;
 				}
 				return;
-			} else if (state == AudioState.FadeOnForNewMusic) {
+			} else if (_musicState == MusicStates.FadeIn) {
 				if (Fade (true))
-					state = AudioState.Default;
+					_musicState = MusicStates.Default;
 				return;
 			}
 			
@@ -321,12 +395,15 @@ namespace AEngine.Audio
 				PlayMusic ();
 			}
 		}
+        */
 
-		void OnApplicationFocus (bool focus)
+        void OnApplicationFocus (bool focus)
 		{
 			if (focus) {
-				if (musicSource.volume == 0)
-					PlayMusic ();
+                if (musicSource.volume == 0)
+                {
+                    //PlayMusic();
+                }
 			} else {
 				musicSource.volume = 0;
 			}
@@ -335,8 +412,10 @@ namespace AEngine.Audio
 		void OnApplicationPause (bool pause)
 		{
 			if (!pause) {
-				if (musicSource.volume == 0)
-					PlayMusic ();
+                if (musicSource.volume == 0)
+                {
+                    //PlayMusic();
+                }
 			} else {
 				musicSource.volume = 0;
 			}

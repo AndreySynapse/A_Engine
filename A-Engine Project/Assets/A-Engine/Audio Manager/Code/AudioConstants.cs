@@ -17,6 +17,7 @@ namespace AEngine.Audio
 
         public const string XML_ROOT = "AudioData";
         public const string XML_RUNTIME_TAG = "RuntimeChangableSettings";
+        public const string XML_FADE_TAG = "Fade";
         public const string XML_ATTRIBUTE_USE_MUSIC = "UseMusic";
         public const string XML_ATTRIBUTE_USE_SOUND = "UseSound";
         public const string XML_ATTRIBUTE_MUSIC_VOLUME = "MusicVolume";
@@ -24,6 +25,8 @@ namespace AEngine.Audio
         public const string XML_ATTRIBUTE_MUSIC_COMPRESSED_VOLUME = "MusicCompressedVolume";
         public const string XML_ATTRIBUTE_SOUND_COMPRESSED_VOLUME = "SoundCompressedVolume";
         public const string XML_ATTRIBUTE_SOUND_SOURCES_COUNT = "SoundSourceCount";
+        public const string XML_ATTRIBUTE_FADE_MODE = "FadeMode";
+        public const string XML_ATTRIBUTE_FADE_DURATION = "FadeDuration";
         
         #region Interface
         public static string GetCachePath()
