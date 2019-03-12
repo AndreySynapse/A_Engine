@@ -5,8 +5,8 @@ public class Test : MonoBehaviour
 {
     private void Start()
     {
-        //AudioManager.Instance.LoadAudioBlock(AudioThemes.NewBlock);
-        //AudioManager.Instance.PlayMusic();
+        AudioManager.Instance.LoadAudioBlock(AudioThemes.NewBlock);
+        AudioManager.Instance.PlayMusic();
     }
 
 }

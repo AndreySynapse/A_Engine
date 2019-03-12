@@ -4,7 +4,7 @@ namespace AEngine.Audio
 {
 	public enum AudioThemes
 	{
-		
+		NewBlock
 	}
 
 	public enum Sounds
@@ -14,6 +14,8 @@ namespace AEngine.Audio
 
 	public enum Musics
 	{
-		
+		GameMusic1,
+		MenuMusic1,
+		MenuMusic2
 	}
 }

@@ -15,6 +15,7 @@ namespace AEngine.Audio
 	{
         private RuntimeChangableSettings _runtimeAudioSettings;
         private GeneralAudioSettings _generalAudioSettings;
+        private FadingMusicSettings _fadingSettings;
 
 		private Dictionary<string, AudioBlock> audioData;
 		private float fadeTime;
@@ -37,6 +38,8 @@ namespace AEngine.Audio
                 _runtimeAudioSettings = new RuntimeChangableSettings();
             if (_generalAudioSettings == null)
                 _generalAudioSettings = new GeneralAudioSettings();
+            if (_fadingSettings == null)
+                _fadingSettings = new FadingMusicSettings();
 
             XmlDocument doc = AudioDataParser.Load();
             AssetDatabase.Refresh();
@@ -60,13 +63,14 @@ namespace AEngine.Audio
             EditorGUILayout.EndHorizontal();
 
             GUILayout.Space(12);
-
-
+            
             _runtimeAudioSettings.Draw();
 			_generalAudioSettings.DrawGUI();
+            _fadingSettings.DrawGUI();
 
             GUILayout.Space(12);
-                        
+                     
+            /*
 			EditorGUILayout.BeginHorizontal ();
 			EditorGUILayout.LabelField ("Fade time", GUILayout.Width (180));
 			fadeTime = EditorGUILayout.FloatField (fadeTime, GUILayout.Width (120));
@@ -79,6 +83,7 @@ namespace AEngine.Audio
 			EditorGUILayout.EndHorizontal ();
 
 			GUILayout.Space (12);
+            */
 
 			EditorGUILayout.BeginHorizontal ();
 			if (GUILayout.Button ("New Audio Block", GUILayout.Width (250))) {

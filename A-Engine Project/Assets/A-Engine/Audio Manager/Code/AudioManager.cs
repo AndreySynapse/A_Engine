@@ -256,11 +256,11 @@ namespace AEngine.Audio
             delay = audioBlock.music.delay;
         }
 
-        public void PlayMusic()
-        {
-            PlayMusic(_generalAudioSettings.FadeMode, _generalAudioSettings.FadeDuration);
-        }
-
+        //public void PlayMusic()
+        //{
+        //    PlayMusic(_generalAudioSettings.FadeMode, _generalAudioSettings.FadeDuration);
+        //}
+        /*
         private void Update()
         {
             switch (_generalAudioSettings.FadeMode)
@@ -270,6 +270,7 @@ namespace AEngine.Audio
                     break;
             }
         }
+        */
 
         private void MusicPlayerDefaultMode()
         {
@@ -308,7 +309,7 @@ namespace AEngine.Audio
 
 
 
-        /*
+        ///*
 		public void PlayMusic (bool fade = false)
 		{
 			if (!_runtimeAudioSettings.UseMusic)
@@ -324,6 +325,7 @@ namespace AEngine.Audio
 			delay = audioBlock.music.delay;
 		}
 
+        
 		public void PlayMusic (string trackName)
 		{
 			if (!_runtimeAudioSettings.UseMusic)
@@ -338,9 +340,9 @@ namespace AEngine.Audio
 		{
 			PlayMusic(musicTrack.ToString());
 		}
-        */
+       
 
-        /*
+       
 		void Update()
 		{
 			if (musicSource.isPlaying)
@@ -395,14 +397,14 @@ namespace AEngine.Audio
 				PlayMusic ();
 			}
 		}
-        */
+        
 
         void OnApplicationFocus (bool focus)
 		{
 			if (focus) {
                 if (musicSource.volume == 0)
                 {
-                    //PlayMusic();
+                    PlayMusic();
                 }
 			} else {
 				musicSource.volume = 0;
@@ -414,7 +416,7 @@ namespace AEngine.Audio
 			if (!pause) {
                 if (musicSource.volume == 0)
                 {
-                    //PlayMusic();
+                    PlayMusic();
                 }
 			} else {
 				musicSource.volume = 0;

@@ -90,7 +90,7 @@ namespace AEngine.Audio
                 EditorGUILayout.LabelField("Max sound source count", GUILayout.Width(FIELDS_CAPTION_WIDTH));
                 this.MaxSoundSources = EditorGUILayout.IntSlider(this.MaxSoundSources, 1, 10, GUILayout.Width(COMPRESSED_SLIDER_WIDHT));
                 EditorGUILayout.EndHorizontal();
-
+                /*
                 GUILayout.Space(6f);
 
                 EditorGUILayout.BeginHorizontal();
@@ -120,7 +120,7 @@ namespace AEngine.Audio
 
                         break;
                 }
-
+                */
                 GUILayout.Space(10f);
             }
         }

@@ -3,4 +3,11 @@
   <AudioConfiguration MusicCompressedVolume="1" SoundCompressedVolume="1" SoundSourceCount="3" fade="0" fadeOn="False">
     <Fade FadeMode="FadeOut" FadeDuration="0,4" />
   </AudioConfiguration>
+  <AudioBlock Name="NewBlock">
+    <Music MusicNotReplyLength="1">
+      <Track Name="GameMusic1" Path="AudioResources/Music/GameMusic1" Volume="1" />
+      <Track Name="MenuMusic1" Path="AudioResources/Music/MenuMusic1" Volume="1" />
+      <Track Name="MenuMusic2" Path="AudioResources/Music/MenuMusic2" Volume="1" />
+    </Music>
+  </AudioBlock>
 </AudioData>
