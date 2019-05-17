@@ -17,7 +17,8 @@ namespace AEngine.Audio
         public FadeMods FadeMode { get; set; }
         public float FadeOutDuration { get; set; }
         public float FadeInDuration { get; set; }
-        public bool ClampDuration { get; set; }
+        public bool ClampOutDuration { get; set; }
+        public bool ClampInDuration { get; set; }
         public float ClampedOutTrack { get; set; }
         public float ClampedInTrack { get; set; }
         public bool IsEvenly { get; set; }
@@ -27,7 +28,8 @@ namespace AEngine.Audio
             this.FadeMode = FadeMods.NotFading;
             this.FadeOutDuration = 0.4f;
             this.FadeInDuration = 0.4f;
-            this.ClampDuration = false;
+            this.ClampOutDuration = false;
+            this.ClampInDuration = false;
             this.ClampedOutTrack = 0.05f;
             this.ClampedInTrack = 0.05f;
             this.IsEvenly = true;
@@ -65,53 +67,61 @@ namespace AEngine.Audio
                     break;
 
                 case FadeMods.FadeInOut:
-                    EditorGUILayout.BeginHorizontal();
-                    GUILayout.Space(offset);
-                    this.IsEvenly = Toogle(this.IsEvenly, "Distribute evenly", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
-                    EditorGUILayout.EndHorizontal();
-
-                    GUILayout.Space(5f);
-
-                    if (this.IsEvenly)
-                    {
-                        float duration = (this.FadeOutDuration + this.FadeInDuration) / 2f;
-
-                        EditorGUILayout.BeginHorizontal();
-                        GUILayout.Space(offset);
-                        duration = FloatField(duration, "Fade Duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
-                        EditorGUILayout.EndHorizontal();
-
-                        this.FadeOutDuration = duration;
-                        this.FadeInDuration = duration;
-
-                        EditorGUILayout.BeginHorizontal();
-                        GUILayout.Space(offset);
-                        this.ClampDuration = Toogle(this.ClampDuration, "Clamp duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
-
-                        if (this.ClampDuration)
-                        {
-                            float clampValue = (this.ClampedOutTrack + this.ClampedInTrack) / 2f;
-                            GUILayout.Space(CAPTION_WIDTH - (SMALL_CAPTION_WIDTH + BASE_FIELD_WIDTH + 7f));
-                            clampValue = Slider(clampValue, "Clamped value by track length", CAPTION_WIDTH, SLIDER_WIDHT);
-
-                            this.ClampedOutTrack = clampValue;
-                            this.ClampedInTrack = clampValue;
-                        }
-                        EditorGUILayout.EndHorizontal();
-                    }
-                    else
-                    {
-                        DrawFadeOut(offset);
-                        GUILayout.Space(5f);
-                        DrawFadeIn(offset);
-                    }
+                    DrawFadeInOut(offset);
                     break;
 
                 case FadeMods.FullFadeCrossMusic:
-
+                    DrawFadeInOut(offset);
                     break;
             }
 
+        }
+
+        private void DrawFadeInOut(float offset)
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(offset);
+            this.IsEvenly = Toogle(this.IsEvenly, "Distribute evenly", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(5f);
+
+            if (this.IsEvenly)
+            {
+                float duration = this.FadeOutDuration + this.FadeInDuration;
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(offset);
+                duration = FloatField(duration, "Fade Duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
+                EditorGUILayout.EndHorizontal();
+
+                this.FadeOutDuration = duration / 2f;
+                this.FadeInDuration = duration / 2f;
+
+                bool clampDuration = this.ClampOutDuration && this.ClampInDuration;
+
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(offset);
+                clampDuration = Toogle(clampDuration, "Clamp duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
+                this.ClampOutDuration = this.ClampInDuration = clampDuration;
+
+                if (clampDuration)
+                {
+                    float clampValue = (this.ClampedOutTrack + this.ClampedInTrack) / 2f;
+                    GUILayout.Space(CAPTION_WIDTH - (SMALL_CAPTION_WIDTH + BASE_FIELD_WIDTH + 7f));
+                    clampValue = Slider(clampValue, "Clamped value by track length", CAPTION_WIDTH, SLIDER_WIDHT);
+
+                    this.ClampedOutTrack = clampValue;
+                    this.ClampedInTrack = clampValue;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            else
+            {
+                DrawFadeOut(offset);
+                GUILayout.Space(5f);
+                DrawFadeIn(offset);
+            }
         }
         
         private void DrawFadeOut(float offset)
@@ -123,9 +133,9 @@ namespace AEngine.Audio
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(offset);
-            this.ClampDuration = Toogle(this.ClampDuration, "Clamp duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
+            this.ClampOutDuration = Toogle(this.ClampOutDuration, "Clamp duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
 
-            if (this.ClampDuration)
+            if (this.ClampOutDuration)
             {
                 GUILayout.Space(CAPTION_WIDTH - (SMALL_CAPTION_WIDTH + BASE_FIELD_WIDTH + 7f));
                 this.ClampedOutTrack = Slider(this.ClampedOutTrack, "Clamped value by out track length", CAPTION_WIDTH, SLIDER_WIDHT);
@@ -142,9 +152,9 @@ namespace AEngine.Audio
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(offset);
-            this.ClampDuration = Toogle(this.ClampDuration, "Clamp duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
+            this.ClampInDuration = Toogle(this.ClampInDuration, "Clamp duration", SMALL_CAPTION_WIDTH, BASE_FIELD_WIDTH);
 
-            if (this.ClampDuration)
+            if (this.ClampInDuration)
             {
                 GUILayout.Space(CAPTION_WIDTH - (SMALL_CAPTION_WIDTH + BASE_FIELD_WIDTH + 7f));
                 this.ClampedInTrack = Slider(this.ClampedInTrack, "Clamped value by in track length", CAPTION_WIDTH, SLIDER_WIDHT);
